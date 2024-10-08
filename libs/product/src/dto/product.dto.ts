@@ -1,10 +1,5 @@
-import {
-  IsArray,
-  IsNumber,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsString, ValidateNested } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -12,9 +7,9 @@ export class CreateProductDto {
 
   @IsString()
   description: string;
-
-  @IsArray({ each: true })
-  @ValidateNested()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductSize)
   size: ProductSize[];
 
   @IsString()
@@ -25,10 +20,9 @@ class ProductSize {
   @IsString()
   name: string;
 
-  @IsNumber()
-  @Min(1)
+  @IsString()
   quantity: number;
 
-  @IsNumber()
+  @IsString()
   price: number;
 }

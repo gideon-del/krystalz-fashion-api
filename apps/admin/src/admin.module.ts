@@ -3,9 +3,10 @@ import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 
 import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
-  imports: [CategoryModule],
+  imports: [CategoryModule, ProductModule],
   controllers: [AdminController],
   providers: [AdminService],
 })
