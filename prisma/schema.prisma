@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  first_name String 
+  last_name String
+  email String @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  password String
+  role Role
+  isVerified Boolean @default(false)
+  Cart Cart[]
+}
+enum Role {
+  ADMIN
+  USER
+}
+
+model Address {
+  id String @id @default(uuid())
+  address String 
+  city String
+  state String
+  transport_fee Float
+  Order Order[]
+}
+model Category {
+  id String @id @default(uuid())
+  name String
+  Product Product[]
+}
+model Product {
+  id String @id @default(uuid())
+  name String
+  description String
+  total_quantity Int
+  Size Size[]
+  category Category @relation(fields: [categoryId],references: [id])
+  categoryId String
+
+  CartProduct CartProduct[]
+
+  Orders Orders[]
+}
+model Size {
+  id String @id @default(uuid())
+  name String
+  quantity Int
+  price Float
+  product Product @relation(fields: [productId], references: [id])
+  productId String
+
+  CartSize CartSize[]
+
+  InventorySize InventorySize[]
+}
+model Cart {
+  id String @id @default(uuid())
+  userId String
+  total Float
+  user User @relation(fields: [userId], references: [id])
+  
+  CartProduct CartProduct[]
+}
+model CartSize{
+  id String @id @default(uuid())
+  quantity Int
+  size_id String
+  size Size @relation(fields: [size_id], references: [id])
+
+  CartProduct CartProduct[]
+
+  Orders Orders[]
+}
+
+model CartProduct {
+  id String @id @default(uuid())
+  cart_id String
+  product_id String
+  cart_size String
+  cartSize CartSize @relation(fields: [cart_size],references: [id])
+  cart Cart @relation(fields: [cart_id], references: [id])
+  product Product @relation(fields: [product_id],references: [id])
+
+}
+
+model Order {
+  id String @id @default(uuid())
+  address_id String
+  address Address @relation(fields: [address_id], references: [id])
+  paystack_reference String
+  status OrderStatus
+  total Float
+
+
+  Orders Orders[]
+
+  Transactions Transactions[]
+}
+enum OrderStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+model Orders {
+id String @id @default(uuid())
+order_id String 
+product_id String
+order Order @relation(fields: [order_id],references: [id])
+product Product @relation(fields: [product_id],references: [id])
+size String
+cartSize CartSize @relation(fields: [size], references: [id])
+}
+
+model Transactions {
+  id String @id @default(uuid())
+  order_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  order Order @relation(fields: [order_id],references: [id])
+}
+
+model Inventory {
+  id String @id @default(uuid())
+  product_id String
+  quantity_sold Int
+  remaining_stock Int
+  status InventoryStatus
+
+  InventorySize InventorySize[]
+}
+model InventorySize {
+  id String @id @default(uuid())
+  inventory_id String
+  size_id String
+  quantity_sold Int
+  remaining_stock Int
+  status InventoryStatus
+  size Size @relation(fields: [size_id],references: [id])
+  inventory Inventory @relation(fields: [inventory_id],references: [id])
+}
+
+enum InventoryStatus {
+  INSTOCK
+  ALMOSTOUT
+  OUTOFSTOCK
+}
