@@ -9,10 +9,12 @@ export class ImageUploader {
       api_secret: process.env.CLOUDINARY_API_SECRET,
     });
   }
-  async upload(filePath: string) {
-    const imageUrl = await cloudinary.uploader.upload(filePath, {
+  async upload(file: Express.Multer.File) {
+    const fileDataUri = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    const imageUrl = await cloudinary.uploader.upload(fileDataUri, {
       folder: 'krystalz',
     });
+    console.log(`Image uploaded ${imageUrl.url}`);
     return imageUrl.url;
   }
 }
