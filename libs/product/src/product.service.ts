@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/product.dto';
 import { ImageUploader } from '@app/shared/services/image-upload.service';
 import { PrismaService } from '@app/shared/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProductService {
@@ -87,5 +88,39 @@ export class ProductService {
       },
     });
     return products;
+  }
+  async getProduct(productId: string) {
+    try {
+      const product = await this.prismaServie.product.findFirstOrThrow({
+        where: {
+          id: productId,
+        },
+        include: {
+          size: {
+            select: {
+              name: true,
+              price: true,
+              quantity: true,
+            },
+          },
+          productImages: {
+            select: {
+              image_url: true,
+            },
+          },
+          category: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+      return product;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new NotFoundException('Product Not found');
+      }
+      throw error;
+    }
   }
 }
