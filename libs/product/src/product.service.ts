@@ -27,12 +27,12 @@ export class ProductService {
           0,
         ),
         categoryId: productDto.categoryId,
-        ProductImages: {
+        productImages: {
           createMany: {
             data: uploadedImage.map((image) => ({ image_url: image })),
           },
         },
-        Size: {
+        size: {
           createMany: {
             data: productDto.size.map((size) => ({
               name: size.name,
@@ -43,8 +43,8 @@ export class ProductService {
         },
       },
       include: {
-        Size: true,
-        ProductImages: true,
+        size: true,
+        productImages: true,
         category: true,
       },
     });

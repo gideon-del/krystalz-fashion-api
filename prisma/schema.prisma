@@ -36,7 +36,7 @@ model Address {
   city String
   state String
   transport_fee Float
-  Order Order[]
+  order Order[]
 }
 model Category {
   id String @id @default(uuid())
@@ -48,15 +48,15 @@ model Product {
   name String
   description String
   total_quantity Int
-  Size Size[]
+  size Size[]
   category Category @relation(fields: [categoryId],references: [id])
   categoryId String
 
-  CartProduct CartProduct[]
+  cartProduct CartProduct[]
 
-  Orders Orders[]
+  orders Orders[]
 
-  ProductImages ProductImages[]
+  productImages ProductImages[]
 }
 model ProductImages {
  id String @id @default(uuid())
@@ -72,9 +72,9 @@ model Size {
   product Product @relation(fields: [productId], references: [id])
   productId String
 
-  CartSize CartSize[]
+  cartSize CartSize[]
 
-  InventorySize InventorySize[]
+  inventorySize InventorySize[]
 }
 model Cart {
   id String @id @default(uuid())
@@ -82,7 +82,7 @@ model Cart {
   total Float
   user User @relation(fields: [userId], references: [id])
   
-  CartProduct CartProduct[]
+  cartProduct CartProduct[]
 }
 model CartSize{
   id String @id @default(uuid())
@@ -90,9 +90,9 @@ model CartSize{
   size_id String
   size Size @relation(fields: [size_id], references: [id])
 
-  CartProduct CartProduct[]
+  cartProduct CartProduct[]
 
-  Orders Orders[]
+  orders Orders[]
 }
 
 model CartProduct {
@@ -115,9 +115,9 @@ model Order {
   total Float
 
 
-  Orders Orders[]
+  orders Orders[]
 
-  Transactions Transactions[]
+  transactions Transactions[]
 }
 enum OrderStatus {
     PENDING
@@ -150,7 +150,7 @@ model Inventory {
   remaining_stock Int
   status InventoryStatus
 
-  InventorySize InventorySize[]
+  inventorySize InventorySize[]
 }
 model InventorySize {
   id String @id @default(uuid())

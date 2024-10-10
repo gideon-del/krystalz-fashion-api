@@ -1,3 +1,4 @@
+import { IsStringNumber } from '@app/shared/decorators/validator/is-string-number.validator';
 import { Type } from 'class-transformer';
 import { IsArray, IsString, ValidateNested } from 'class-validator';
 
@@ -20,9 +21,9 @@ class ProductSize {
   @IsString()
   name: string;
 
-  @IsString()
+  @IsStringNumber()
   quantity: number;
 
-  @IsString()
+  @IsStringNumber()
   price: number;
 }
