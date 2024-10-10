@@ -43,11 +43,49 @@ export class ProductService {
         },
       },
       include: {
-        size: true,
-        productImages: true,
-        category: true,
+        size: {
+          select: {
+            name: true,
+            price: true,
+            quantity: true,
+          },
+        },
+        productImages: {
+          select: {
+            image_url: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
     return product;
+  }
+  async getAllProduct() {
+    const products = await this.prismaServie.product.findMany({
+      include: {
+        size: {
+          select: {
+            name: true,
+            price: true,
+            quantity: true,
+          },
+        },
+        productImages: {
+          select: {
+            image_url: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    return products;
   }
 }
