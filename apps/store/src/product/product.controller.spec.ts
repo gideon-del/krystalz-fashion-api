@@ -15,4 +15,8 @@ describe('ProductController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+  it('should get Products', async () => {
+    const products = await controller.getAllProduct();
+    expect(products).toBeTruthy();
+  });
 });

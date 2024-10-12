@@ -23,7 +23,7 @@ model User {
   password String
   role Role
   isVerified Boolean @default(false)
-  Cart Cart[]
+  cart Cart?
 }
 enum Role {
   ADMIN
@@ -52,7 +52,7 @@ model Product {
   category Category @relation(fields: [categoryId],references: [id])
   categoryId String
 
-  cartProduct CartProduct[]
+  
 
   orders Orders[]
 
@@ -71,39 +71,27 @@ model Size {
   price Float
   product Product @relation(fields: [productId], references: [id])
   productId String
-
-  cartSize CartSize[]
-
+  cartProduct CartProduct[]
+  order Orders[]
   inventorySize InventorySize[]
 }
 model Cart {
   id String @id @default(uuid())
-  userId String
+  userId String @unique
   total Float
   user User @relation(fields: [userId], references: [id])
   
   cartProduct CartProduct[]
 }
-model CartSize{
-  id String @id @default(uuid())
-  quantity Int
-  size_id String
-  size Size @relation(fields: [size_id], references: [id])
-
-  cartProduct CartProduct[]
-
-  orders Orders[]
-}
 
 model CartProduct {
   id String @id @default(uuid())
   cart_id String
-  product_id String
-  cart_size String
-  cartSize CartSize @relation(fields: [cart_size],references: [id])
+  size_id String 
+  quantity Int
+  size Size @relation(fields: [size_id], references: [id])
   cart Cart @relation(fields: [cart_id], references: [id])
-  product Product @relation(fields: [product_id],references: [id])
-
+  @@unique(fields: [cart_id,size_id])
 }
 
 model Order {
@@ -129,10 +117,11 @@ model Orders {
 id String @id @default(uuid())
 order_id String 
 product_id String
+size_id String
+sold_quantity Int
 order Order @relation(fields: [order_id],references: [id])
 product Product @relation(fields: [product_id],references: [id])
-size String
-cartSize CartSize @relation(fields: [size], references: [id])
+size Size @relation(fields: [size_id],references: [id])
 }
 
 model Transactions {

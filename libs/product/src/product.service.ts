@@ -65,6 +65,11 @@ export class ProductService {
     });
     return product;
   }
+  /**
+   * retrieves all the products in the db
+   * @returns {Product[]}
+
+   */
   async getAllProduct() {
     const products = await this.prismaServie.product.findMany({
       include: {
@@ -73,6 +78,7 @@ export class ProductService {
             name: true,
             price: true,
             quantity: true,
+            id: true,
           },
         },
         productImages: {
@@ -83,12 +89,19 @@ export class ProductService {
         category: {
           select: {
             name: true,
+            id: true,
           },
         },
       },
     });
     return products;
   }
+  /**
+   * Retrieves the product based on id
+   * @param productId: string
+   * @returns {Product | null}
+   *
+   */
   async getProduct(productId: string) {
     try {
       const product = await this.prismaServie.product.findFirstOrThrow({
@@ -101,6 +114,7 @@ export class ProductService {
               name: true,
               price: true,
               quantity: true,
+              id: true,
             },
           },
           productImages: {
