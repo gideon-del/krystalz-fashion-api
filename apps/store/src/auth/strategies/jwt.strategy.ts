@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -13,10 +14,11 @@ export class JwtStratgey extends PassportStrategy(Strategy) {
     });
   }
   async validate(payload: any) {
-    const user = this.userService.findUserById(payload.id);
+    const user = await this.userService.findUserById(payload.id);
     if (!user) {
       throw new UnauthorizedException();
     }
-    return user;
+    const { password, ...rest } = user;
+    return rest;
   }
 }

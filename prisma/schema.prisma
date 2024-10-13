@@ -93,19 +93,21 @@ model CartProduct {
 model Order {
   id String @id @default(uuid())
   user_id String
-  paystack_reference String
+  paystack_reference String @unique
   status OrderStatus
   total Float
   authorization_url String
   user User @relation(fields: [user_id],references: [id])
   orders Orders[]
-  transactions Transactions[]
-
+  transactions Transactions?
+  reason String @default("")
 }
 enum OrderStatus {
     PENDING
-    APPROVED
-    REJECTED
+    PAYED
+    DELIVERED
+    REFUNDED
+    DELETED
 }
 
 model Orders {
@@ -120,7 +122,7 @@ size Size @relation(fields: [size_id],references: [id])
 
 model Transactions {
   id String @id @default(uuid())
-  order_id String
+  order_id String @unique
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
   order Order @relation(fields: [order_id],references: [id])

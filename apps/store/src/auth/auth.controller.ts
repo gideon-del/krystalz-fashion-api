@@ -17,14 +17,11 @@ export class AuthController {
 
   @Post('register')
   async registerUser(@Body() userDto: CreateUserDto) {
-    console.log('Received');
-    const user = await this.authService.register(userDto);
-    return user;
+    return await this.authService.register(userDto);
   }
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Request() req) {
-    console.log(req.user);
     return this.authService.login(req.user);
   }
   @UseGuards(JwtGuard)
