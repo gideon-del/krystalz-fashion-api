@@ -81,13 +81,15 @@ export class OrderService {
       throw error;
     }
   }
-  async deletUserOrder(orderId: string) {
+  async deletUserOrder(orderId: string, userId: string) {
     const order = await this.prismaService.order.findUnique({
       where: {
         id: orderId,
+        user_id: userId,
       },
     });
-    if (order.status === 'DELETED') {
+
+    if (!order || order.status === 'DELETED') {
       throw new NotFoundException('Order not found');
     }
     if (order.status !== 'PENDING') {

@@ -20,8 +20,8 @@ export class OrderController {
   }
 
   @Delete('/:orderId')
-  async deleteOrder(@Param() { orderId }: { orderId: string }) {
-    return this.orderService.deletUserOrder(orderId);
+  async deleteOrder(@Param() { orderId }: { orderId: string }, @Req() req) {
+    return this.orderService.deletUserOrder(orderId, req.user.id);
   }
   @Get()
   async getUserOrders(@Req() req) {

@@ -22,3 +22,9 @@ export class CreateCartDto {
   @ValidateNested({ each: true })
   cart: CartProduct;
 }
+
+export class UpdateCartItemDto {
+  @IsNumber()
+  @Min(1)
+  quantity: number;
+}

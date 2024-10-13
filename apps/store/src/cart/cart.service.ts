@@ -1,12 +1,38 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCartDto } from './dto/cart.dto';
 import { PrismaService } from '@app/shared/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class CartService {
-  constructor(private prismaService: PrismaService) {}
+  cartSelect: any;
+  constructor(private prismaService: PrismaService) {
+    this.cartSelect = {
+      cartProduct: {
+        select: {
+          cart_id: false,
+          quantity: true,
+          size_id: false,
+          size: {
+            select: {
+              productId: false,
+              product: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      userId: false,
+    };
+  }
   async createCart({ cart }: CreateCartDto, userId: string) {
     try {
       const existingCart = await this.prismaService.cart.findFirst({
@@ -41,7 +67,7 @@ export class CartService {
       if (existingCartProduct) {
         throw new ConflictException('Product size already in cart');
       }
-      const cartProduct = this.prismaService.cart.update({
+      const cartProduct = await this.prismaService.cart.update({
         where: {
           userId,
           id: existingCart.id,
@@ -58,7 +84,7 @@ export class CartService {
         },
         select: {
           cartProduct: {
-            include: {
+            select: {
               size: {
                 include: {
                   product: true,
@@ -70,7 +96,69 @@ export class CartService {
       });
       return cartProduct;
     } catch (error) {
+      // TODO: ADD LOGGER
       throw new ConflictException('Product already in cart');
+    }
+  }
+  async updateCartItem(
+    userId: string,
+    cartId: string,
+    updatedQuantity: number,
+  ) {
+    try {
+      const cartItem = await this.prismaService.cartProduct.findUnique({
+        where: {
+          id: cartId,
+          cart: {
+            userId,
+          },
+        },
+      });
+      if (!cartItem) {
+        throw new NotFoundException('Product not in cart');
+      }
+      const cart = await this.prismaService.cart.update({
+        where: {
+          userId,
+        },
+        data: {
+          cartProduct: {
+            update: {
+              where: {
+                id: cartItem.id,
+              },
+              data: {
+                quantity: updatedQuantity,
+              },
+            },
+          },
+        },
+        select: this.cartSelect,
+      });
+      return cart;
+    } catch (error) {
+      // TODO: ADD LOGGER
+      throw error;
+    }
+  }
+  async getUserCarts(userId: string) {
+    try {
+      const cart = this.prismaService.cart.findUnique({
+        where: {
+          userId,
+        },
+        select: this.cartSelect,
+      });
+      if (!cart) {
+        return {
+          cartProduct: [],
+        };
+      }
+      return cart;
+    } catch (error) {
+      // TODO: ADD LOGGER
+      console.log(error);
+      throw error;
     }
   }
 }
