@@ -24,6 +24,7 @@ model User {
   role Role
   isVerified Boolean @default(false)
   cart Cart?
+  order Order[]
 }
 enum Role {
   ADMIN
@@ -36,7 +37,7 @@ model Address {
   city String
   state String
   transport_fee Float
-  order Order[]
+  
 }
 model Category {
   id String @id @default(uuid())
@@ -51,11 +52,6 @@ model Product {
   size Size[]
   category Category @relation(fields: [categoryId],references: [id])
   categoryId String
-
-  
-
-  orders Orders[]
-
   productImages ProductImages[]
 }
 model ProductImages {
@@ -90,22 +86,21 @@ model CartProduct {
   size_id String 
   quantity Int
   size Size @relation(fields: [size_id], references: [id])
-  cart Cart @relation(fields: [cart_id], references: [id])
+  cart Cart @relation(fields: [cart_id], references: [id],onDelete: Cascade)
   @@unique(fields: [cart_id,size_id])
 }
 
 model Order {
   id String @id @default(uuid())
-  address_id String
-  address Address @relation(fields: [address_id], references: [id])
+  user_id String
   paystack_reference String
   status OrderStatus
   total Float
-
-
+  authorization_url String
+  user User @relation(fields: [user_id],references: [id])
   orders Orders[]
-
   transactions Transactions[]
+
 }
 enum OrderStatus {
     PENDING
@@ -116,12 +111,11 @@ enum OrderStatus {
 model Orders {
 id String @id @default(uuid())
 order_id String 
-product_id String
 size_id String
 sold_quantity Int
 order Order @relation(fields: [order_id],references: [id])
-product Product @relation(fields: [product_id],references: [id])
 size Size @relation(fields: [size_id],references: [id])
+
 }
 
 model Transactions {
@@ -130,6 +124,7 @@ model Transactions {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
   order Order @relation(fields: [order_id],references: [id])
+
 }
 
 model Inventory {
